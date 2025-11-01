@@ -36,7 +36,7 @@ export class User {
   @Length(3, 20, { message: 'Password must be between 3 and 20 characters' })
   password: string;
 
-  @Column({ type: 'enum', enum: ['admin', 'user'] })
+  @Column({ type: 'enum', enum: ['admin', 'user'], default: 'user' })
   @IsNotEmpty()
   Role: string;
 
