@@ -50,8 +50,8 @@ export class UserController {
   @Roles(UserType.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiResponse({ status: 200, description: 'List of all users.' })
-  getAll() {
-    return this.userService.getAll();
+  getAll(@Query() query: any) {
+    return this.userService.getAll(query);
   }
 
   @Get('email')
