@@ -24,6 +24,7 @@ import { UserType } from 'src/utils/enums';
 import { AuthGuard } from './guard/auth.guard';
 import { User } from './entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
+import { GetUsersQueryDto } from './dto/get-users-query.dto';
 
 @ApiTags('users')
 @Controller('user')
@@ -50,7 +51,7 @@ export class UserController {
   @Roles(UserType.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiResponse({ status: 200, description: 'List of all users.' })
-  getAll(@Query() query: any) {
+  getAll(@Query() query: GetUsersQueryDto) {
     return this.userService.getAll(query);
   }
 
