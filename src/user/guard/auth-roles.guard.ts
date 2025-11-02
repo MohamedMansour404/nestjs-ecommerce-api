@@ -38,6 +38,13 @@ export class AuthRolesGuard extends BaseAuthGuard implements CanActivate {
       throw new ForbiddenException('Access denied: insufficient permissions');
     }
 
+    if (payload.role === UserType.USER) {
+      const paramId = Number(request.params.id);
+      if (paramId && payload.id !== paramId) {
+        throw new ForbiddenException('You can only access your own data');
+      }
+    }
+
     return true;
   }
 }
