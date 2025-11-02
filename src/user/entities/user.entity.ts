@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -6,6 +7,8 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { UserType } from 'src/utils/enums';
 import {
   Column,
   CreateDateColumn,
@@ -30,51 +33,52 @@ export class User {
   @IsNotEmpty()
   email: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 255 })
   @IsString()
   @IsNotEmpty()
   @Length(3, 20, { message: 'Password must be between 3 and 20 characters' })
+  @Exclude()
   password: string;
 
-  @Column({ type: 'enum', enum: ['admin', 'user'], default: 'user' })
+  @Column({ type: 'enum', enum: UserType, default: 'user' })
   @IsNotEmpty()
-  Role: string;
+  role: UserType;
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
   @IsString()
-  Avatar: string;
+  avatar: string;
 
   @Column({ type: 'int', nullable: true })
   @IsOptional()
-  Age: number;
+  age: number;
 
-  @Column({ type: 'varchar', length: 11, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   @IsOptional()
   @IsPhoneNumber('EG')
-  Phone_Number: string;
+  phoneNumber: string;
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
   @IsString()
-  Address: string;
+  address: string;
 
   @Column({ type: 'boolean', default: false })
-  Active: boolean;
+  active: boolean;
 
   @Column({ type: 'varchar', nullable: true })
   @IsString()
-  Verification_Code: string;
+  verificationCode: string;
 
   @Column({ type: 'enum', enum: ['male', 'female'], nullable: true })
   gender: string;
 
   @CreateDateColumn({
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: () => CURRENT_TIMESTAMP,
   })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   updatedAt: Date;
 }

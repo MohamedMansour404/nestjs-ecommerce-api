@@ -13,6 +13,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserType } from 'src/utils/enums';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'Name of the user', minLength: 3, maxLength: 30 })
@@ -39,12 +40,12 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Role of the user',
-    enum: ['admin', 'user'],
-    required: false,
+    enum: UserType,
+    required: true,
   })
-  @IsEnum(['admin', 'user'], { message: 'Role must be admin or user' })
-  @IsOptional()
-  role?: string;
+  @IsEnum(UserType, { message: 'Role must be admin or user' })
+  @IsNotEmpty()
+  role: UserType;
 
   @ApiProperty({ description: 'Avatar URL', required: false })
   @IsString({ message: 'Avatar must be a string' })
@@ -63,7 +64,7 @@ export class CreateUserDto {
     message: 'Phone number must be a valid Egyptian number',
   })
   @IsOptional()
-  phone_number?: string;
+  phoneNumber?: string;
 
   @ApiProperty({ description: 'Address of the user', required: false })
   @IsString({ message: 'Address must be a string' })
@@ -84,7 +85,7 @@ export class CreateUserDto {
   @IsString({ message: 'Verification code must be a string' })
   @Length(6, 6, { message: 'Verification code must be 6 characters' })
   @IsOptional()
-  verificationcode?: string;
+  verificationCode?: string;
 
   @ApiProperty({
     description: 'Gender of the user',

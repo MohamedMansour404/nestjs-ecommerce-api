@@ -1,7 +1,7 @@
 import { UserType } from './enums';
 
 export interface JWTPayloadType {
-  sub: string;
+  id: number;
   email: string;
   name: string;
   role: UserType;
