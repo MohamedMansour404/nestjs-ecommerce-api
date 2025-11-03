@@ -8,13 +8,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    // 🔹 Load environment variables for JWT
     ConfigModule,
 
-    // 🔹 Import user module for DB operations
     forwardRef(() => UserModule),
 
-    // 🔹 Register JWT module asynchronously (cleaner + flexible)
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
