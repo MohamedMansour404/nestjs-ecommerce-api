@@ -51,5 +51,5 @@ export class RegisterDto {
   })
   @IsEnum(GenderType)
   @IsOptional()
-  gender?: string;
+  gender?: GenderType;
 }

@@ -36,7 +36,7 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   @IsString()
   @IsNotEmpty()
-  @Length(3, 20, { message: 'Password must be between 3 and 20 characters' })
+  @Length(6, 20, { message: 'Password must be between 6 and 20 characters' })
   @Exclude()
   password: string;
 

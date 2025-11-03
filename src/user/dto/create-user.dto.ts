@@ -30,7 +30,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Password of the user',
-    minLength: 3,
+    minLength: 6,
     maxLength: 20,
   })
   @IsString({ message: 'Password must be a string' })
@@ -94,5 +94,5 @@ export class CreateUserDto {
   })
   @IsEnum(GenderType, { message: 'Gender must be male or female' })
   @IsOptional()
-  gender?: string;
+  gender?: GenderType;
 }
