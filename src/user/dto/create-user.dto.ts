@@ -13,7 +13,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserType } from 'src/utils/enums';
+import { GenderType, UserType } from 'src/utils/enums';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'Name of the user', minLength: 3, maxLength: 30 })
@@ -34,7 +34,7 @@ export class CreateUserDto {
     maxLength: 20,
   })
   @IsString({ message: 'Password must be a string' })
-  @MinLength(3, { message: 'Password must be at least 3 characters' })
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
   @MaxLength(20, { message: 'Password must be at most 20 characters' })
   password: string;
 
@@ -89,10 +89,10 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Gender of the user',
-    enum: ['male', 'female'],
+    enum: GenderType,
     required: false,
   })
-  @IsEnum(['male', 'female'], { message: 'Gender must be male or female' })
+  @IsEnum(GenderType, { message: 'Gender must be male or female' })
   @IsOptional()
   gender?: string;
 }

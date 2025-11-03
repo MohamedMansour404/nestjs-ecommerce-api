@@ -10,6 +10,7 @@ import {
   IsPhoneNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { GenderType } from 'src/utils/enums';
 
 export class RegisterDto {
   @ApiProperty({ description: 'Name of the user', minLength: 3, maxLength: 30 })
@@ -45,10 +46,10 @@ export class RegisterDto {
 
   @ApiProperty({
     description: 'Gender of the user',
-    enum: ['male', 'female'],
+    enum: GenderType,
     required: false,
   })
-  @IsEnum(['male', 'female'])
+  @IsEnum(GenderType)
   @IsOptional()
   gender?: string;
 }

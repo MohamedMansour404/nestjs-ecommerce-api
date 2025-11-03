@@ -8,7 +8,7 @@ import {
   Length,
 } from 'class-validator';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
-import { UserType } from 'src/utils/enums';
+import { GenderType, UserType } from 'src/utils/enums';
 import {
   Column,
   CreateDateColumn,
@@ -55,7 +55,6 @@ export class User {
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   @IsOptional()
-  @IsPhoneNumber('EG')
   phoneNumber: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -70,8 +69,8 @@ export class User {
   @IsString()
   verificationCode: string;
 
-  @Column({ type: 'enum', enum: ['male', 'female'], nullable: true })
-  gender: string;
+  @Column({ type: 'enum', enum: GenderType, nullable: true })
+  gender: GenderType;
 
   @CreateDateColumn({
     type: 'timestamp',
