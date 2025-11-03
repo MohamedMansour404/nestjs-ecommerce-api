@@ -2,91 +2,41 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcryptjs';
-import { JWTPayloadType } from 'src/utils/types';
-import { JwtService } from '@nestjs/jwt';
+import { hashPassword } from 'src/utils/hash';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
+
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
-
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    const salt: string = await bcrypt.genSalt(10);
-    const hashedPassword: string = await bcrypt.hash(password, salt);
+    const hashedPassword = password ? await hashPassword(password) : undefined;
 
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
 
-    const savedUser = await this.userRepository.save(newUser);
-
-    const accessToken = await this.generateJWT({
-      id: savedUser.id,
-      email: savedUser.email,
-      name: savedUser.name,
-      role: savedUser.role,
-    });
-
-    return {
-      message: 'User created successfully',
-      user: savedUser,
-      accessToken,
-    };
+    return await this.userRepository.save(newUser);
   }
 
-  async login(email: string, password: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const accessToken = await this.generateJWT({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    });
-
-    return {
-      message: 'Login successful',
-      accessToken,
-      user,
-    };
-  }
-
-  async getAll(query: any): Promise<{
-    data: User[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    nextPage: number | null;
-    prevPage: number | null;
-  }> {
+  async getAll(query: any) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
     const maxLimit = 1000;
@@ -131,9 +81,7 @@ export class UserService {
 
   async getUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found!`);
-    }
+    if (!user) throw new NotFoundException(`User with ID ${id} not found!`);
     return user;
   }
 
@@ -141,14 +89,9 @@ export class UserService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async updateUser(
-    id: number,
-    updateUserDto: Partial<CreateUserDto>,
-  ): Promise<User> {
+  async updateUser(id: number, updateUserDto: Partial<CreateUserDto>) {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found!`);
-    }
+    if (!user) throw new NotFoundException(`User with ID ${id} not found!`);
 
     if (updateUserDto.email && updateUserDto.email !== user.email) {
       const emailExists = await this.userRepository.findOne({
@@ -162,26 +105,18 @@ export class UserService {
     }
 
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+      updateUserDto.password = await hashPassword(updateUserDto.password);
     }
 
     Object.assign(user, updateUserDto);
-
     return this.userRepository.save(user);
   }
 
-  async deleteUser(id: number): Promise<{ message: string }> {
+  async deleteUser(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found!`);
-    }
+    if (!user) throw new NotFoundException(`User with ID ${id} not found!`);
 
     await this.userRepository.remove(user);
-
     return { message: `User with ID ${id} deleted successfully` };
-  }
-
-  private generateJWT(payload: JWTPayloadType): Promise<string> {
-    return this.jwtService.signAsync(payload);
   }
 }

@@ -18,13 +18,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthRolesGuard } from './guard/auth-roles.guard';
-import { Roles } from './decorators/user-role.decorator';
 import { UserType } from 'src/utils/enums';
-import { AuthGuard } from './guard/auth.guard';
 import { User } from './entities/user.entity';
-import { LoginUserDto } from './dto/login-user.dto';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthRolesGuard } from 'src/auth/guards/auth-roles.guard';
+import { Roles } from 'src/auth/decorators/user-role.decorator';
 
 @ApiTags('users')
 @Controller('user')
@@ -32,17 +31,13 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard, AuthRolesGuard)
+  @Roles(UserType.ADMIN)
+  @ApiOperation({ summary: 'Create a new user (admin only)' })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Post('login')
-  @ApiOperation({ summary: 'Login user and get JWT token' })
-  @ApiResponse({ status: 200, description: 'User logged in successfully' })
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return this.userService.login(loginUserDto.email, loginUserDto.password);
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
   }
 
   @Get()
