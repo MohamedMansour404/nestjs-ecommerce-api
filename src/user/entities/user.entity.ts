@@ -67,7 +67,11 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true })
   @IsString()
+  @IsOptional()
   verificationCode: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  verificationCodeExpires: Date;
 
   @Column({ type: 'enum', enum: GenderType, nullable: true })
   gender: GenderType;
