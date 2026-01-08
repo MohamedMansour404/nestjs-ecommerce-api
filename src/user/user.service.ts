@@ -1,13 +1,17 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Like, Repository } from 'typeorm';
+import { Like, MoreThan, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { hashPassword } from 'src/utils/hash';
+import { GetUsersQueryDto } from './dto/get-users-query.dto';
+import { createHash } from 'crypto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -36,7 +40,7 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
-  async getAll(query: any) {
+  async getAll(query: GetUsersQueryDto) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
     const maxLimit = 1000;
@@ -89,7 +93,7 @@ export class UserService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async updateUser(id: number, updateUserDto: Partial<CreateUserDto>) {
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException(`User with ID ${id} not found!`);
 
@@ -118,5 +122,51 @@ export class UserService {
 
     await this.userRepository.remove(user);
     return { message: `User with ID ${id} deleted successfully` };
+  }
+
+  async setVerificationCode(email: string, code: string) {
+    const hashedCode = createHash('sha256').update(code).digest('hex');
+
+    const result = await this.userRepository.update(
+      { email },
+      {
+        verificationCode: hashedCode,
+        verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000),
+      },
+    );
+
+    console.log('Affected rows:', result.affected);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('User Not Found');
+    }
+  }
+
+  async verifyResetCode(email: string, code: string) {
+    const hashedCode = createHash('sha256').update(code).digest('hex');
+
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+        verificationCode: hashedCode,
+        verificationCodeExpires: MoreThan(new Date()),
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired code');
+    }
+
+    return user;
+  }
+
+  async clearVerificationCode(userId: number) {
+    await this.userRepository.update(
+      { id: userId },
+      {
+        verificationCode: null,
+        verificationCodeExpires: null,
+      },
+    );
   }
 }
