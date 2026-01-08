@@ -24,9 +24,10 @@ import { GetUsersQueryDto } from './dto/get-users-query.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { AuthRolesGuard } from 'src/auth/guards/auth-roles.guard';
 import { Roles } from 'src/auth/decorators/user-role.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('users')
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -78,7 +79,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: Partial<CreateUserDto>,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.userService.updateUser(id, updateUserDto);
   }
