@@ -1,12 +1,4 @@
 import { Exclude } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Length,
-} from 'class-validator';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import { GenderType, UserType } from 'src/utils/enums';
 import {
