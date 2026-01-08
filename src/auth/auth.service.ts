@@ -17,6 +17,7 @@ import { JWTPayloadType } from 'src/utils/types';
 import { hashPassword, comparePassword } from 'src/utils/hash';
 import { MailerService } from '@nestjs-modules/mailer';
 import { resetPasswordTemplate } from 'src/templates/reset-password.template';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -86,9 +87,7 @@ export class AuthService {
       };
     }
 
-    const code = Math.floor(Math.random() * 1000000)
-      .toString()
-      .padStart(6, '0');
+    const code = randomInt(0, 1000000).toString().padStart(6, '0');
 
     await this.userService.setVerificationCode(email, code);
 
