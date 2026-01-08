@@ -21,10 +21,10 @@ import {
 import { UserType } from 'src/utils/enums';
 import { User } from './entities/user.entity';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { AuthRolesGuard } from 'src/auth/guards/auth-roles.guard';
-import { Roles } from 'src/auth/decorators/user-role.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { AuthRolesGuard } from 'src/shared/guards/auth-roles.guard';
+import { Roles } from 'src/shared/decorators/user-role.decorator';
 
 @ApiTags('users')
 @Controller('users')
